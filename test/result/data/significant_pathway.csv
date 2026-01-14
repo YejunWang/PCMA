@@ -1,0 +1,11 @@
+,PC,Label,p_value
+88,PC1,positive_Amphetamines and derivatives,0.0023299685796070403
+118,PC1,positive_Benzenesulfonic acids and derivatives,0.02659409788133636
+156,PC1,positive_Brassinolides and derivatives,0.017598030664831947
+180,PC1,positive_Cholesterols and derivatives,0.021488813461088503
+182,PC1,positive_Cholesteryl esters,0.024391995320496497
+258,PC1,positive_Fatty acid esters,0.041635240621490044
+489,PC1,negative_Phenols,0.027595015100052484
+591,PC1,negative_Sphingolipids,0.00011446673813487814
+667,PC1,negative_Triterpenoids,0.04277504732791817
+681,PC1,negative_Very long-chain fatty acids,0.023713367610734032

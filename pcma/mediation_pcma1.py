@@ -1,0 +1,127 @@
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+from .bootstrap_analysis import bootstrap_p_values
+
+
+def mediation_pcma1_single(designated_bact_name: str,
+                           Bacteria_designated: pd.DataFrame,
+                           meta_pca_df: pd.DataFrame,
+                           Sample_Name: pd.Series,
+                           Diagnosis: pd.Series,
+                           n_bootstrap=1000):
+    '''running PCMA1'''
+    media_df = meta_pca_df.copy()
+    media_df.insert(0, 'Sample_Name', Sample_Name)
+    media_df.insert(1, designated_bact_name, Bacteria_designated)
+    media_df.insert(2, 'Diagnoisis', Diagnosis)
+
+    # init result
+    result_dict = {}
+    result_coef = {}
+
+    x_col = media_df.columns[1]
+    y_col = media_df.columns[2]
+    encoded_y = media_df[y_col]
+    # Y = cX + ε1
+    model1 = sm.Logit(encoded_y,
+                      sm.add_constant(media_df[x_col])).fit(disp=False)
+    coef_c = model1.params.iloc[1]
+
+    # mediation lood
+    for i in range(3, len(media_df.columns)):
+        try:
+            mediator_col = media_df.columns[i]
+
+            # M=aX+ε2
+            model2 = sm.OLS(media_df[mediator_col],
+                            sm.add_constant(media_df[x_col])).fit(disp=False)
+            coef_a = model2.params.iloc[1]  # get coef
+
+            # Y=c'X+bM+ε3
+            model3 = sm.Logit(encoded_y,
+                              sm.add_constant(media_df[[x_col, mediator_col
+                                                        ]])).fit(disp=False)
+            coef_c_prime = model3.params.iloc[1]
+            coef_b = model3.params.iloc[2]
+
+            #  X→M regression coef of a standard error
+            a_se = model2.bse.iloc[1]
+
+            #  M→Y regression coef of a standard error
+            b_se = model3.bse.iloc[2]
+
+            # compute t
+            t_stat_a = coef_a / a_se  #  X→M regression coef t
+            t_stat_b = coef_b / b_se  #  M→Y regression coef t
+
+            # z_ab
+            z_ab = t_stat_a * t_stat_b
+
+            # Bootstrap p
+            bootstrap_z_values = bootstrap_p_values(media_df, encoded_y, x_col,
+                                                    mediator_col, n_bootstrap)
+
+            # compute p
+            p_value = (
+                np.sum(np.abs(np.array(bootstrap_z_values)) >= np.abs(z_ab)) +
+                1) / (n_bootstrap + 1)
+
+            # significant
+            significance = "Significant" if p_value < 0.05 else "InSignificant"
+
+            # 存储结果
+            result_dict[mediator_col] = (p_value, significance)
+            result_coef[mediator_col] = (coef_a, coef_b, coef_c, coef_c_prime,
+                                         coef_a * coef_b)
+
+        except Exception as e:
+            print(f"Error in dealing with {mediator_col} : {e}")
+            continue
+
+    # get sig PC
+    significant_pc = [
+        pc for pc, (p_value, significance) in result_dict.items()
+        if significance == 'Significant'
+    ]
+
+    # create DataFrame included sig PC
+    significant_pc_df = pd.DataFrame(significant_pc,
+                                     columns=['Significant_PC'])
+    significant_pc_df['Bacteria_PC'] = designated_bact_name
+
+    # get coef
+    result_coef = pd.DataFrame.from_dict(result_coef,
+                                         orient='index',
+                                         columns=[
+                                             'coef_a', 'coef_b', 'coef_c',
+                                             'coef_c_prime', 'coef_a * coef_b'
+                                         ])
+    result_coef.reset_index(inplace=True)
+    result_coef.rename(columns={'index': 'Metabolite_PC'}, inplace=True)
+
+    return significant_pc_df, result_coef
+
+
+def mediation_pcma1(designated_bact_name: list,
+                    Bacteria_designated: pd.DataFrame,
+                    meta_pca_df: pd.DataFrame,
+                    Sample_Name: pd.Series,
+                    Diagnosis: pd.Series,
+                    n_bootstrap=1000):
+    result_all_bact = {}
+    result_all_bact_coef = {}
+    for single_bact in designated_bact_name:
+        print(f'processing {single_bact}...')
+        single_bact_result, single_bact_coef = mediation_pcma1_single(
+            single_bact, Bacteria_designated[single_bact], meta_pca_df,
+            Sample_Name, Diagnosis, n_bootstrap)
+        result_all_bact[single_bact] = single_bact_result
+        result_all_bact_coef[single_bact] = single_bact_coef
+    result_final_df = pd.DataFrame()
+    for bact, df in result_all_bact.items():
+        result_final_df = pd.concat([result_final_df, df], ignore_index=True)
+
+    result_final_coef = pd.concat(result_all_bact_coef).reset_index(
+        level=0).rename(columns={'level_0': 'Bacteria'})
+    return result_final_df, result_final_coef
