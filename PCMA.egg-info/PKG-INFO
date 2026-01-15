@@ -5,9 +5,3 @@ Summary: A package for PCA mediation analysis
 Home-page: NA
 Author: yukki & Eathon
 Description-Content-Type: text/markdown
-Requires-Dist: numpy
-Requires-Dist: pandas
-Requires-Dist: scikit-learn
-Requires-Dist: scipy
-Requires-Dist: statsmodels
-Requires-Dist: joblib

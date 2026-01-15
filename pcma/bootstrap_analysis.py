@@ -5,15 +5,15 @@ import statsmodels.api as sm
 def bootstrap_p_values(media_df, encoded_y, x_col, mediator_col, n_bootstrap):
 
     def bootstrap_iteration(media_df, encoded_y, x_col, mediator_col):
-        sampled_df = media_df.sample(frac=1, replace=True)
-        sampled_encoded_y = encoded_y.sample(frac=1, replace=True)
+        combined_df = media_df.copy()
+        combined_df['encoded_y'] = encoded_y
+        sampled_df = combined_df.sample(frac=1, replace=True)
 
-        sampled_encoded_y.reset_index(drop=True, inplace=True)
-        sampled_df.reset_index(drop=True, inplace=True)
+        sampled_encoded_y = sampled_df['encoded_y']
+        sampled_df = sampled_df.drop('encoded_y', axis=1)
 
         model2_bootstrap = sm.OLS(sampled_df[mediator_col],
-                                  sm.add_constant(
-                                      sampled_df[x_col])).fit(disp=False)
+                                  sm.add_constant(sampled_df[x_col])).fit()
         coef_a_bootstrap = model2_bootstrap.params.iloc[1]
 
         model3_bootstrap = sm.Logit(

@@ -90,7 +90,12 @@ def pcma1(designated_bacteria_name: list,
 
     # PCA
     meta_scale_data, meta_pca_df, meta_pca_contribution, meta_pca_components = run_pca(
-        Metabolite_filt_final)
+        Metabolite_filt_final,
+        PC_num=meta_PC_num,
+        norm_method=meta_PC_norm_method,
+        if_whiten=meta_if_whiten,
+        Norm=meta_Norm,
+        seeds=meta_seeds)
 
     # mediation
     result, coef = mediation_pcma1(designated_bacteria_name,
@@ -105,26 +110,27 @@ def pcma1(designated_bacteria_name: list,
                        index=False)
     meta_pca_contribution.to_csv(os.path.join(
         file_dir, 'Metabolite_pca_contribution.csv'),
-        index=False)
+                                 index=False)
     meta_pca_components.to_csv(os.path.join(file_dir,
                                             'Metabolite_pca_components.csv'),
                                index=False)
-    Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
+    if 'Sample_Name' not in Metabolite_filt_final.columns:
+        Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
     Metabolite_filt_final.to_csv(os.path.join(file_dir,
                                               "Metabolite_filtered.csv"),
                                  index=False)
     Meta_Diag_corr_origin.to_csv(os.path.join(
         file_dir, 'Metabolite_Diagnosis_correlation_all.csv'),
-        index=False)
+                                 index=False)
     Meta_Diag_corr.to_csv(os.path.join(
         file_dir, 'Metabolite_Diagnosis_correlation_filtered.csv'),
-        index=False)
+                          index=False)
     Bact_Meta_corr_origin.to_csv(os.path.join(
         file_dir, 'Bacteria_Metabolite_correaltion_all.csv'),
-        index=False)
+                                 index=False)
     Bact_Meta_corr.to_csv(os.path.join(
         file_dir, 'Bacteria_Metabolite_correaltion_filtered.csv'),
-        index=False)
+                          index=False)
     result.to_csv(os.path.join(file_dir, 'Siginficant_PC.csv'), index=False)
     coef.to_csv(os.path.join(file_dir, 'coefficient.csv'), index=False)
     # output all paraments users choose
@@ -137,11 +143,11 @@ def pcma1(designated_bacteria_name: list,
         'PCA_X_result': 'NA',
         'PCA_X_components': 'NA',
         'PCA_X_EVR': 'NA',
-        'PCA_M_result': f"{os.path.join(file_dir, 'Metabolite_pca.csv')}",
+        'PCA_M_result': f"{os.path.join(file_dir,'Metabolite_pca.csv')}",
         'PCA_M_components':
-        f"{os.path.join(file_dir, 'Metabolite_pca_components.csv')}",
+        f"{os.path.join(file_dir,'Metabolite_pca_components.csv')}",
         'PCA_M_EVR':
-        f"{os.path.join(file_dir, 'Metabolite_pca_contribution.csv')}",
+        f"{os.path.join(file_dir,'Metabolite_pca_contribution.csv')}",
         'output_dir': output_dir,
         'Bacteria_dir': Bacteria_dir,
         'Metabolite_dir': Metabolite_dir,
@@ -175,19 +181,19 @@ def pcma1(designated_bacteria_name: list,
     # Bact_Meta
     volcano(resource_data=os.path.join(
         file_dir, 'Bacteria_Metabolite_correaltion_all.csv'),
-        plot_dir=os.path.join(
-        plot_dir, 'Volcano_plot_Bacteria_Metabolite_correlation.pdf'),
-        y_value=p_filter_method_Bacteria_Metabolite,
-        y_threshold=str(p_threshold_Bacteria_Metabolite),
-        SCC_threshold=str(SCC_threshold_Bacteria_Metabolite))
+            plot_dir=os.path.join(
+                plot_dir, 'Volcano_plot_Bacteria_Metabolite_correlation.pdf'),
+            y_value=p_filter_method_Bacteria_Metabolite,
+            y_threshold=str(p_threshold_Bacteria_Metabolite),
+            SCC_threshold=str(SCC_threshold_Bacteria_Metabolite))
     # Meta_Diag
     volcano(resource_data=os.path.join(
         file_dir, 'Metabolite_Diagnosis_correlation_all.csv'),
-        plot_dir=os.path.join(
-        plot_dir, 'Volcano_plot_Metabolite_Diagnosis_correlation.pdf'),
-        y_value=p_filter_method_Metabolite_Diagnosis,
-        y_threshold=str(p_threshold_Bacteria_Metabolite),
-        SCC_threshold=str(SCC_threshold_Bacteria_Metabolite))
+            plot_dir=os.path.join(
+                plot_dir, 'Volcano_plot_Metabolite_Diagnosis_correlation.pdf'),
+            y_value=p_filter_method_Metabolite_Diagnosis,
+            y_threshold=str(p_threshold_Bacteria_Metabolite),
+            SCC_threshold=str(SCC_threshold_Bacteria_Metabolite))
 
     # heatmap_scale
     heatmap_scale(Metabolite_dir,

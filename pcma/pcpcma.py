@@ -150,6 +150,8 @@ def pcpcma(output_dir: str,
     Bact_Diag_corr.to_csv(os.path.join(
         file_dir, 'Bacteria_Diagnosis_correaltion_filtered.csv'),
                           index=False)
+    if 'Sample_Name' in Bacteria_filt.columns:
+        Bacteria_filt.drop('Sample_Name', axis=1, inplace=True)
     Bacteria_filt.insert(0, 'Sample_Name', Bacteria.iloc[:, 0])
     Bacteria_filt.to_csv(os.path.join(file_dir, 'Bacteria_filtered.csv'),
                          index=False)
@@ -253,9 +255,8 @@ def pcpcma(output_dir: str,
     # boxplot
     boxplot_2(file_dir, Bacteria_dir, Metabolite_dir, Diagnosis_dir, plot_dir)
     # functional analysis
-    if is_func_anal == False:
-        pass
-    if is_func_anal == True:
+
+    if is_func_anal == "True":
         metabolite_analysis(
             os.path.join(file_dir, 'Metabolite_pca_components.csv'),
             func_anal_file, os.path.join(file_dir, 'Siginficant_PC.csv'),

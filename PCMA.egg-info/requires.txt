@@ -4,3 +4,9 @@ scikit-learn
 scipy
 statsmodels
 joblib
+kaleido
+jinja2
+weasyprint
+pdf2image
+plotly
+PyPDF2

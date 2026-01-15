@@ -117,11 +117,11 @@ def report(result_dir, file_dir, plot_dir):
              f"{os.path.join(file_dir, 'Metabolite_scale_data.csv')}"
          ]],
         'heatmap_plot_1':
-        f"file://{pdf2png(plot_dir,'heatmap_metabolite_raw')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'heatmap_metabolite_raw')}",
         'heatmap_plot_1_caption':
         "Heatmap (Before Normalization)",
         'heatmap_plot_2':
-        f"file://{pdf2png(plot_dir,'heatmap_metabolite_scale')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'heatmap_metabolite_scale')}",
         'heatmap_plot_2_caption':
         "Heatmap (After Normalization)",
         # 3
@@ -145,13 +145,13 @@ def report(result_dir, file_dir, plot_dir):
              f"{parms.loc[parms['Parameter'] == 'PCA_X_EVR', 'Value'].values[0]}",
          ]],
         'PCA_X_heatmap':
-        f"{'file://' + pdf2png(plot_dir, 'PCA_X_heatmap') if parms.loc[parms['Parameter'] == 'PCA_X_heatmap', 'Value'].values[0] == 'True' else 'NA'}",
+        f"{'file:///mnt/md0/Public/PCMA_Web_sever/PCMA/' + pdf2png(plot_dir, 'PCA_X_heatmap') if parms.loc[parms['Parameter'] == 'PCA_X_heatmap', 'Value'].values[0] == 'True' else 'NA'}",
         'PCA_X_heatmap_caption':
         'PCA Bacteria Heatmap (PC1 to PC15)',
 
         # 3.2
         'PCA_M_heatmap':
-        f"file://{pdf2png(plot_dir,'PCA_M_heatmap')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'PCA_M_heatmap')}",
         'PCA_M_diagram':
         [[
             "Result (Values of each sample's PC)",
@@ -171,7 +171,7 @@ def report(result_dir, file_dir, plot_dir):
         'PCA Metabolite Heatmap (PC1 to PC15)',
         # 4
         'heatmap_sig_PC':
-        f"file://{pdf2png(plot_dir,'heatmap')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'heatmap')}",
         'heatmap_sig_PC_caption':
         'Significant PC Plot. X-axis: bacteria (PC), Y-axis: metabolites (PC)',
         'significant_results_path':
@@ -179,30 +179,30 @@ def report(result_dir, file_dir, plot_dir):
         'coff_mediation_path':
         f"{os.path.join(file_dir,'coefficient.csv')}",
         'sankey_Plot':
-        f"file://{os.path.join(plot_dir,'sankey_plot.png')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{os.path.join(plot_dir,'sankey_plot.png')}",
         'sanekey_Plot_caption':
         'Sankey Plot. From left to right, the three layers are Bacteria (PC), Metabolites (PC), and Disease Phenotype.',
         # 5
         'boxplot_bacteria':
-        f"file://{pdf2png(plot_dir,'boxplot_bacteria')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'boxplot_bacteria')}",
         'boxplot_bacteria_caption':
         '',
         'boxplot_metabolite':
-        f"file://{pdf2png(plot_dir,'boxplot_metabolite')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'boxplot_metabolite')}",
         'boxplot_metabolite_caption':
         'Boxplot for metabolite in Significant Metabolite PC.',
         'boxplot_metabolite_pc':
-        f"file://{pdf2png(plot_dir,'boxplot_metabolite_pc')}",
+        f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'boxplot_metabolite_pc')}",
         'boxplot_metabolite_pc_caption':
         'Boxplot for Metabolite Significant PC'
     }
     if main_method == 'PCMA1':
         context[
-            'volcano_plot_1'] = f"file://{pdf2png(plot_dir,'Volcano_plot_Bacteria_Metabolite_correlation')}"
+            'volcano_plot_1'] = f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'Volcano_plot_Bacteria_Metabolite_correlation')}"
         context[
             'volcano_plot_1_caption'] = "Bacteria-Metabolite Correlation Analysis Volcano Plot"
         context[
-            'volcano_plot_2'] = f"file://{pdf2png(plot_dir,'Volcano_plot_Metabolite_Diagnosis_correlation')}"
+            'volcano_plot_2'] = f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'Volcano_plot_Metabolite_Diagnosis_correlation')}"
         context[
             'volcano_plot_2_caption'] = "Metabolite-Diagnosis Correlation Analysis Volcano Plot"
         context[
@@ -224,17 +224,17 @@ def report(result_dir, file_dir, plot_dir):
         ]
     elif main_method == 'PCPCMA':
         context[
-            'volcano_plot_1'] = f"file://{pdf2png(plot_dir,'Volcano_plot_Bacteria_Diagnosis_correlation')}"
+            'volcano_plot_1'] = f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'Volcano_plot_Bacteria_Diagnosis_correlation')}"
         context[
             'volcano_plot_1_caption'] = "Bacteria-Metabolite Correlation Analysis Volcano Plot"
         context[
-            'volcano_plot_2'] = f"file://{pdf2png(plot_dir,'Volcano_plot_Metabolite_Diagnosis_correlation')}"
+            'volcano_plot_2'] = f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'Volcano_plot_Metabolite_Diagnosis_correlation')}"
         context[
             'volcano_plot_2_caption'] = "Metabolite-Diagnosis Correlation Analysis Volcano Plot"
         context[
             'boxplot_bacteria_caption'] = 'Boxplot for Bacteria Relative abundance in Significant Bacteria PC'
         context[
-            'boxplot_bacteria_pc'] = f"file://{pdf2png(plot_dir,'boxplot_bacteria_pc')}"
+            'boxplot_bacteria_pc'] = f"file:///mnt/md0/Public/PCMA_Web_sever/PCMA/{pdf2png(plot_dir,'boxplot_bacteria_pc')}"
         context[
             'boxplot_bacteria_pc_caption'] = 'Boxplot for Bacteria Significant PC'
         context['feature_selection'] = [

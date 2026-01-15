@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+import statsmodels.stats.multitest as smm
 from .bootstrap_analysis import bootstrap_p_values
 
 
@@ -8,13 +9,34 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
                      bact_pca_df: pd.DataFrame,
                      Sample_Name: pd.Series,
                      Diagnoisis: pd.Series,
-                     n_bootstrap=1000):
+                     n_bootstrap=1000,
+                     FDR=False):
     # running PCPCMA
     media_df_origin = meta_pca_df
     media_df_origin.insert(0, 'Sample_Name', Sample_Name)
     media_df_origin.insert(1, 'Diagnoisis', Diagnoisis)
     result_all = {}
     result_all_bact_coef = {}
+
+    # define check significant
+    def check_significance_via_bootstrap(bootstrap_z_values,
+                                         confidence_level=0.90):
+        sorted_z_values = np.sort(bootstrap_z_values)
+
+        lower_percentile = (1 - confidence_level) / 2
+        upper_percentile = 1 - lower_percentile
+
+        lower_bound = np.percentile(sorted_z_values, lower_percentile * 100)
+        upper_bound = np.percentile(sorted_z_values, upper_percentile * 100)
+
+        significance = "Significant" if (
+            lower_bound > 0 or upper_bound < 0) else 'InSignificant'
+
+        p_value = (np.sum(np.array(bootstrap_z_values) > 0) +
+                   1) / (len(bootstrap_z_values) + 1)
+        p_value = min(p_value, 1 - p_value)
+
+        return significance, p_value
 
     def mulit_mediation(bact_pc):
         print(f' {bact_pc} is processing...')
@@ -66,13 +88,9 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
                 # Bootstrap compute p
                 bootstrap_z_values = bootstrap_p_values(
                     media_df, encoded_y, x_col, mediator_col, n_bootstrap)
-                # p
-                p_value = (np.sum(
-                    np.abs(np.array(bootstrap_z_values)) >= np.abs(z_ab)) +
-                           1) / (n_bootstrap + 1)
-
-                # significant
-                significance = "Significant" if p_value < 0.05 else "Insignificant"
+                # compute p and significant
+                significance, p_value = check_significance_via_bootstrap(
+                    bootstrap_z_values)
 
                 result_dict_single_mediaton[mediator_col] = (p_value,
                                                              significance)
@@ -86,6 +104,32 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
         # loop mediation
         for index_media_df in range(3, len(media_df.columns)):
             single_mediation(index_media_df)
+
+        if FDR == True:
+            #  filte NA
+            result_dict_single_mediaton = {
+                key: value
+                for key, value in result_dict_single_mediaton.items()
+                if isinstance(value[0], (int,
+                                         float)) and not np.isnan(value[0])
+            }
+
+            # BH FDR
+            p_values = [
+                value[0] for value in result_dict_single_mediaton.values()
+            ]
+            if len(p_values) != 0:
+                _, corrected_p_values, _, _ = smm.multipletests(
+                    p_values, method='fdr_bh')
+
+                for i, (key, (p_value, significance)) in enumerate(
+                        result_dict_single_mediaton.items()):
+                    corrected_p_value = corrected_p_values[i]
+                    new_significance = 'Significant' if corrected_p_value < 0.05 else 'InSignificant'
+                    result_dict_single_mediaton[key] = (corrected_p_value,
+                                                        new_significance)
+            else:
+                pass
 
         # get sig PC
         significant_pc = [

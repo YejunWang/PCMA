@@ -29,7 +29,6 @@ def pcma2(output_dir: str,
           meta_Norm=True,
           meta_seeds=0,
           n_bootstrap=1000,
-          volcano_plot_y_value='p',
           is_func_anal=False,
           func_anal_file=""):
     '''PCMA1 workflow'''
@@ -87,7 +86,12 @@ def pcma2(output_dir: str,
 
     # PCA
     meta_scale_data, meta_pca_df, meta_pca_contribution, meta_pca_components = run_pca(
-        Metabolite_filt_final)
+        Metabolite_filt_final,
+        PC_num=meta_PC_num,
+        norm_method=meta_PC_norm_method,
+        if_whiten=meta_if_whiten,
+        Norm=meta_Norm,
+        seeds=meta_seeds)
 
     # %%
     # mediation
@@ -120,7 +124,8 @@ def pcma2(output_dir: str,
     Bact_Diag_corr.to_csv(os.path.join(
         file_dir, 'Bacteria_Diagnosis_correaltion_filtered.csv'),
                           index=False)
-    Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
+    if 'Sample_Name' not in Metabolite_filt_final.columns:
+        Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
     Metabolite_filt_final.to_csv(os.path.join(file_dir,
                                               'Metabolite_filtered.csv'),
                                  index=False)
@@ -169,7 +174,6 @@ def pcma2(output_dir: str,
         'meta_Norm': meta_Norm,
         'meta_seeds': meta_seeds,
         'n_bootstrap': n_bootstrap,
-        'volcano_plot_y_value': volcano_plot_y_value,
         'is_function_analysis': is_func_anal,
         "function_analysis_file": func_anal_file
     }
