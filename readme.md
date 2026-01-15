@@ -9,6 +9,8 @@ To install the latest version of PCMA using `uv pip`.
 uv pip install git+https://github.com/YejunWang/PCMA.git
 ```
 
+Note: Some folders in PCMA are not installed via pip. You can manually move them to the correct folder based on the error message.
+
 # cite us
 
 Weimiao Kong, Yuqi Lin, and Yejun Wang. 2024. PCMA: A New Mediation Analysis Method Effectively Identifies Relevant Pathways Connecting Microbiota and Diseases. In Proceedings of the 15th ACM International Conference on Bioinformatics, Computational Biology and Health Informatics (BCB '24). Association for Computing Machinery, New York, NY, USA, Article 79, 1. https://doi.org/10.1145/3698587.3701428
