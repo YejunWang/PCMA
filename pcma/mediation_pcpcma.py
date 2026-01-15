@@ -17,6 +17,7 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
     media_df_origin.insert(1, 'Diagnoisis', Diagnoisis)
     result_all = {}
     result_all_bact_coef = {}
+    result_all_bact_dict = {}
 
     # define check significant
     def check_significance_via_bootstrap(bootstrap_z_values,
@@ -151,9 +152,16 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
                                                  'coef_c_prime',
                                                  'coef_a * coef_b'
                                              ])
+        result_dict = pd.DataFrame.from_dict(result_dict_single_mediaton,
+                                         orient='index',
+                                         columns=[
+                                             'p_value', 'significance'
+                                         ])
         result_coef.reset_index(inplace=True)
         result_coef.rename(columns={'index': 'Metabolite_PC'}, inplace=True)
+        result_dict.rename(columns={'index': 'Metabolite_PC'}, inplace=True)
         result_all_bact_coef[bact_pc] = result_coef
+        result_all_bact_dict[bact_pc] = result_dict
 
     for bact_pc in bact_pca_df.columns:
         mulit_mediation(bact_pc)
@@ -166,5 +174,7 @@ def mediation_PCPCMA(meta_pca_df: pd.DataFrame,
 
     result_final_coef = pd.concat(result_all_bact_coef).reset_index(
         level=0).rename(columns={'level_0': 'Bacteria_PC'})
+    result_final_dict = pd.concat(result_all_bact_dict).reset_index(
+        level=0).rename(columns={'level_0': 'Bacteria_PC'})
 
-    return result_finall_df, result_final_coef
+    return result_finall_df, result_final_coef, result_final_dict

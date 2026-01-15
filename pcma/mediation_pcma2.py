@@ -134,9 +134,15 @@ def mediation_pcma2_single(designated_bact_name: str,
                                              'coef_a', 'coef_b', 'coef_c',
                                              'coef_c_prime', 'coef_a * coef_b'
                                          ])
+    result_dict = pd.DataFrame.from_dict(result_dict,
+                                         orient='index',
+                                         columns=[
+                                             'p_value', 'significance'
+                                         ])
     result_coef.reset_index(inplace=True)
     result_coef.rename(columns={'index': 'Metabolite_PC'}, inplace=True)
-    return significant_pc_df, result_coef
+    result_dict.rename(columns={'index': 'Metabolite_PC'}, inplace=True)
+    return significant_pc_df, result_coef, result_dict
 
 
 def mediation_pcma2(Bacteria: pd.DataFrame,
@@ -146,16 +152,18 @@ def mediation_pcma2(Bacteria: pd.DataFrame,
                     n_bootstrap=1000):
     result_pcam2 = {}
     result_all_bact_coef = {}
+    result_all_bact_dict = {}
     turn = 0
     all_turn = len(pd.unique(Bacteria.columns))
     for single_bact in pd.unique(Bacteria.columns):
         turn += 1
         print(f'processing {turn}/{all_turn}...')
-        result_pcma2_single, result_coef_single = mediation_pcma2_single(
+        result_pcma2_single, result_coef_single, result_dict_single = mediation_pcma2_single(
             single_bact, Bacteria[single_bact], meta_pca_df, Sample_Name,
             Diagnosis, n_bootstrap)
         result_pcam2[single_bact] = result_pcma2_single
         result_all_bact_coef[single_bact] = result_coef_single
+        result_all_bact_dict[single_bact] = result_dict_single
     result_final_df = pd.DataFrame()
 
     for bact_pc, df in result_pcam2.items():
@@ -163,4 +171,6 @@ def mediation_pcma2(Bacteria: pd.DataFrame,
         result_final_df = pd.concat([result_final_df, df], ignore_index=True)
     result_final_coef = pd.concat(result_all_bact_coef).reset_index(
         level=0).rename(columns={'level_0': 'Bacteria'})
-    return result_final_df, result_final_coef
+    result_final_dict = pd.concat(result_all_bact_dict).reset_index(
+        level=0).rename(columns={'level_0': 'Bacteria'})
+    return result_final_df, result_final_coef, result_final_dict

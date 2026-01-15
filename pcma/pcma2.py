@@ -95,7 +95,7 @@ def pcma2(output_dir: str,
 
     # %%
     # mediation
-    result_mediation, coef = mediation_pcma2(Bacteria_filt, meta_pca_df,
+    result_mediation, coef, p_value = mediation_pcma2(Bacteria_filt, meta_pca_df,
                                              Metabolite.iloc[:, 0],
                                              Diagnosis.iloc[:, 1])
 
@@ -124,8 +124,7 @@ def pcma2(output_dir: str,
     Bact_Diag_corr.to_csv(os.path.join(
         file_dir, 'Bacteria_Diagnosis_correaltion_filtered.csv'),
                           index=False)
-    if 'Sample_Name' not in Metabolite_filt_final.columns:
-        Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
+    Metabolite_filt_final.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
     Metabolite_filt_final.to_csv(os.path.join(file_dir,
                                               'Metabolite_filtered.csv'),
                                  index=False)
@@ -134,6 +133,7 @@ def pcma2(output_dir: str,
     result_mediation.to_csv(os.path.join(file_dir, 'Siginficant_PC.csv'),
                             index=False)
     coef.to_csv(os.path.join(file_dir, 'coefficient.csv'), index=False)
+    p_value.to_csv(os.path.join(file_dir, 'p_value.csv'), index=False)
 
     # output all paraments users choose
     params = {
@@ -155,7 +155,6 @@ def pcma2(output_dir: str,
         'Bacteria_dir': Bacteria_dir,
         'Metabolite_dir': Metabolite_dir,
         'Diagnosis_dir': Diagnosis_dir,
-        'y_type': y_type,
         'SCC_threshold_Metabolite_Diagnosis':
         SCC_threshold_Metabolite_Diagnosis,
         'SCC_threshold_Bacteria_Diagnosis': SCC_threshold_Bacteria_Diagnosis,

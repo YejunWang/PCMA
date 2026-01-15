@@ -98,9 +98,9 @@ def pcma1(designated_bacteria_name: list,
         seeds=meta_seeds)
 
     # mediation
-    result, coef = mediation_pcma1(designated_bacteria_name,
+    result, coef, p_value = mediation_pcma1(designated_bacteria_name,
                                    Bacteria_designated, meta_pca_df,
-                                   Metabolite.iloc[:, 0], Diagnosis.iloc[:, 1])
+                                   Metabolite.iloc[:, 0], Diagnosis.iloc[:, 1])  
     # serialize data
     meta_scale_data.insert(0, 'Sample_Name', Metabolite.iloc[:, 0])
     meta_scale_data.to_csv(os.path.join(file_dir, 'Metabolite_scale_data.csv'),
@@ -133,6 +133,8 @@ def pcma1(designated_bacteria_name: list,
                           index=False)
     result.to_csv(os.path.join(file_dir, 'Siginficant_PC.csv'), index=False)
     coef.to_csv(os.path.join(file_dir, 'coefficient.csv'), index=False)
+    p_value.to_csv(os.path.join(file_dir, 'p_value.csv'), index=False)
+    
     # output all paraments users choose
     params = {
         'method': 'PCMA1',

@@ -109,7 +109,7 @@ def pcpcma(output_dir: str,
 
     # mediation
     print('Begin to mediation analysis')
-    result, coef = mediation_PCPCMA(meta_pca_df,
+    result, coef, p_value = mediation_PCPCMA(meta_pca_df,
                                     bact_pca_df,
                                     Bacteria.iloc[:, 0],
                                     Diagnosis.iloc[:, 1],
@@ -160,6 +160,7 @@ def pcpcma(output_dir: str,
                            index=False)
     result.to_csv(os.path.join(file_dir, 'Siginficant_PC.csv'), index=False)
     coef.to_csv(os.path.join(file_dir, 'correlation.csv'), index=False)
+    p_value.to_csv(os.path.join(file_dir, 'p_value.csv'), index=False)
     # output all paraments users choose
     params = {
         'method': 'PCPCMA',
